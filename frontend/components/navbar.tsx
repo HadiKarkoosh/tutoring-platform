@@ -1,12 +1,22 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '../lib/auth-context';
 
 export default function Navbar() {
   const { user, loading, logout } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
+
+  function goToTutors(e: React.MouseEvent) {
+    // Already on the listing — a Link to the same URL is a no-op, which
+    // reads as "the button does nothing". Scroll back up instead.
+    if (pathname === '/') {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
 
   return (
     <nav className="navbar">
@@ -15,7 +25,7 @@ export default function Navbar() {
           📚 منصة الدروس
         </Link>
         <div className="nav-links">
-          <Link href="/" className="nav-link">
+          <Link href="/" className="nav-link" onClick={goToTutors}>
             المدرّسون
           </Link>
           {!loading && user && (

@@ -11,6 +11,7 @@ import { TutorsModule } from './tutors/tutors.module';
 import { BookingsModule } from './bookings/bookings.module';
 import { SubjectsModule } from './subjects/subjects.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import { SeedModule } from './seed/seed.module';
 
 @Module({
   imports: [
@@ -25,6 +26,8 @@ import { ReviewsModule } from './reviews/reviews.module';
     BookingsModule,
     SubjectsModule,
     ReviewsModule,
+    // Must come after SubjectsModule so its seed data exists first.
+    SeedModule,
   ],
   controllers: [AppController],
 })
