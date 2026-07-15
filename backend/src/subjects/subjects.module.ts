@@ -26,6 +26,7 @@ export class SubjectsModule implements OnModuleInit {
           'لغة إنجليزية',
           'لغة عربية',
           'برمجة',
+          'إدارة أعمال',
         ].map((name) => this.subjects.create({ name })),
       );
     }

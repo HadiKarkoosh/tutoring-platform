@@ -44,9 +44,9 @@ const NAMED_TUTORS: SeedTutor[] = [
     name: 'Malaz Mansour',
     email: 'malaz@gmail.com',
     password: 'password1',
-    subjectName: 'لغة إنجليزية',
-    bio: 'مدرّبة لغة إنجليزية معتمدة، بتركّز على المحادثة والثقة باستخدام اللغة.',
-    hourlyRate: 20,
+    subjectName: 'إدارة أعمال',
+    bio: 'مدرّبة إدارة أعمال، بتغطي أساسيات التسويق والمحاسبة وإدارة المشاريع بأسلوب عملي.',
+    hourlyRate: 22,
   },
 ];
 
