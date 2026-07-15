@@ -3,11 +3,13 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { api, Subject, Tutor } from '../lib/api';
+import Stars from '../components/stars';
 
 export default function HomePage() {
   const [tutors, setTutors] = useState<Tutor[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [filter, setFilter] = useState('');
+  const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -16,21 +18,36 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    setLoading(true);
-    setError('');
-    api<Tutor[]>(`/tutors${filter ? `?subject=${encodeURIComponent(filter)}` : ''}`)
-      .then(setTutors)
-      .catch(() =>
-        setError('تعذّر الاتصال بالخادم — تأكد أن الباك اند شغّال على المنفذ 4000'),
-      )
-      .finally(() => setLoading(false));
-  }, [filter]);
+    const handle = setTimeout(() => {
+      setLoading(true);
+      setError('');
+      const params = new URLSearchParams();
+      if (filter) params.set('subject', filter);
+      if (search.trim()) params.set('search', search.trim());
+      const qs = params.toString();
+      api<Tutor[]>(`/tutors${qs ? `?${qs}` : ''}`)
+        .then(setTutors)
+        .catch(() =>
+          setError('تعذّر الاتصال بالخادم — تأكد أن الباك اند شغّال على المنفذ 4000'),
+        )
+        .finally(() => setLoading(false));
+    }, 300);
+    return () => clearTimeout(handle);
+  }, [filter, search]);
 
   return (
     <>
       <div className="hero">
         <h1>ابحث عن مدرّسك المثالي</h1>
         <p>تصفح المدرّسين حسب المادة، شوف مواعيدهم المتاحة، واحجز درسك بضغطة زر.</p>
+      </div>
+
+      <div className="field" style={{ maxWidth: 360 }}>
+        <input
+          placeholder="🔍 دوّر باسم المدرّس…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
       </div>
 
       <div className="filters">
@@ -54,7 +71,10 @@ export default function HomePage() {
       {error && <div className="alert alert-error">{error}</div>}
       {loading && <p className="muted">جارٍ التحميل…</p>}
       {!loading && !error && tutors.length === 0 && (
-        <p className="muted">لا يوجد مدرّسون حالياً{filter ? ` لمادة ${filter}` : ''}.</p>
+        <p className="muted">
+          لا يوجد مدرّسون{filter ? ` لمادة ${filter}` : ''}
+          {search ? ` يطابقون "${search}"` : ''}.
+        </p>
       )}
 
       <div className="grid">
@@ -62,6 +82,9 @@ export default function HomePage() {
           <Link key={t.id} href={`/tutors/${t.id}`}>
             <div className="card" style={{ height: '100%' }}>
               <h3 style={{ marginBottom: 4 }}>{t.name}</h3>
+              <div style={{ marginBottom: 6 }}>
+                <Stars rating={t.avgRating} />
+              </div>
               {t.hourlyRate != null && (
                 <p className="muted" style={{ marginBottom: 8 }}>
                   💰 {t.hourlyRate} / ساعة

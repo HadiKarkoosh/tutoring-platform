@@ -12,7 +12,18 @@ export interface Tutor {
   bio: string | null;
   hourlyRate: number | null;
   subjects: Subject[];
+  avgRating: number | null;
+  reviewCount?: number;
+  reviews?: Review[];
   availableSlots?: Slot[];
+}
+
+export interface Review {
+  id: string;
+  rating: number;
+  comment: string | null;
+  createdAt: string;
+  student?: { id: string; name: string };
 }
 
 export interface Slot {

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   UnauthorizedException,
@@ -6,11 +7,14 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
+import * as crypto from 'crypto';
 import { In, Repository } from 'typeorm';
 import { Subject } from '../entities/subject.entity';
 import { User } from '../entities/user.entity';
-import { LoginDto, RegisterDto } from './dto';
+import { ForgotPasswordDto, LoginDto, RegisterDto, ResetPasswordDto } from './dto';
 import { JwtPayload } from './jwt.strategy';
+
+const RESET_TOKEN_TTL_MS = 60 * 60 * 1000; // 1 hour
 
 @Injectable()
 export class AuthService {
@@ -51,6 +55,51 @@ export class AuthService {
       throw new UnauthorizedException('بيانات الدخول غير صحيحة');
     }
     return this.issueToken(user);
+  }
+
+  /**
+   * Portfolio-scale project with no email provider wired up: instead of
+   * sending an email, the reset link is returned directly in the response
+   * so the flow is fully demoable. A real deployment would email `resetUrl`
+   * and drop it from the API response.
+   */
+  async forgotPassword(dto: ForgotPasswordDto) {
+    const genericMessage =
+      'إذا كان البريد الإلكتروني مسجّل عندنا، رح تلاقي رابط إعادة التعيين هون.';
+    const user = await this.users.findOne({ where: { email: dto.email } });
+    if (!user) return { message: genericMessage };
+
+    const token = crypto.randomBytes(32).toString('hex');
+    user.resetTokenHash = crypto.createHash('sha256').update(token).digest('hex');
+    user.resetTokenExpiresAt = new Date(Date.now() + RESET_TOKEN_TTL_MS);
+    await this.users.save(user);
+
+    const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:3000';
+    return {
+      message: genericMessage,
+      resetUrl: `${frontendUrl}/reset-password?token=${token}`,
+    };
+  }
+
+  async resetPassword(dto: ResetPasswordDto) {
+    const tokenHash = crypto.createHash('sha256').update(dto.token).digest('hex');
+    const user = await this.users
+      .createQueryBuilder('u')
+      .addSelect(['u.resetTokenHash', 'u.resetTokenExpiresAt'])
+      .where('u.resetTokenHash = :tokenHash', { tokenHash })
+      .getOne();
+    if (
+      !user ||
+      !user.resetTokenExpiresAt ||
+      user.resetTokenExpiresAt < new Date()
+    ) {
+      throw new BadRequestException('رابط إعادة التعيين غير صالح أو منتهي الصلاحية');
+    }
+    user.passwordHash = await bcrypt.hash(dto.password, 10);
+    user.resetTokenHash = null;
+    user.resetTokenExpiresAt = null;
+    await this.users.save(user);
+    return { message: 'تم تغيير كلمة المرور بنجاح' };
   }
 
   private issueToken(user: User) {

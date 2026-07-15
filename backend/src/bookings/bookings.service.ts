@@ -9,10 +9,20 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { AvailabilitySlot } from '../entities/availability-slot.entity';
 import { Booking } from '../entities/booking.entity';
+import { Mutex } from '../common/mutex';
 import { User } from '../entities/user.entity';
 
 @Injectable()
 export class BookingsService {
+  /**
+   * better-sqlite3 is a single synchronous connection, so two overlapping
+   * `dataSource.transaction()` calls both issue BEGIN on it and the second
+   * one throws instead of queueing. This mutex serializes access to that one
+   * connection so the atomic conditional UPDATE below is what actually
+   * decides the winner, instead of both requests crashing.
+   */
+  private writeLock = new Mutex();
+
   constructor(
     @InjectRepository(Booking) private bookings: Repository<Booking>,
     private dataSource: DataSource,
@@ -27,6 +37,10 @@ export class BookingsService {
    * 3. The unique JoinColumn on Booking.slot is a second, DB-level safety net.
    */
   async create(studentId: string, slotId: string) {
+    return this.writeLock.runExclusive(() => this.doCreate(studentId, slotId));
+  }
+
+  private async doCreate(studentId: string, slotId: string) {
     return this.dataSource.transaction(async (manager) => {
       const slot = await manager.findOne(AvailabilitySlot, {
         where: { id: slotId },
@@ -68,6 +82,10 @@ export class BookingsService {
 
   /** Cancel a booking and free its slot (transactional). */
   async cancel(studentId: string, bookingId: string) {
+    return this.writeLock.runExclusive(() => this.doCancel(studentId, bookingId));
+  }
+
+  private async doCancel(studentId: string, bookingId: string) {
     return this.dataSource.transaction(async (manager) => {
       const booking = await manager.findOne(Booking, {
         where: { id: bookingId },

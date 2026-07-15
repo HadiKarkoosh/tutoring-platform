@@ -10,6 +10,7 @@ export default function RegisterPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
   const [role, setRole] = useState<'student' | 'tutor'>('student');
   const [bio, setBio] = useState('');
   const [hourlyRate, setHourlyRate] = useState('');
@@ -33,6 +34,10 @@ export default function RegisterPage() {
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setError('');
+    if (password !== passwordConfirm) {
+      setError('كلمتا المرور غير متطابقتين');
+      return;
+    }
     setBusy(true);
     try {
       const body: Record<string, unknown> = { name, email, password, role };
@@ -82,6 +87,17 @@ export default function RegisterPage() {
             minLength={6}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            dir="ltr"
+          />
+        </div>
+        <div className="field">
+          <label>تأكيد كلمة المرور</label>
+          <input
+            type="password"
+            required
+            minLength={6}
+            value={passwordConfirm}
+            onChange={(e) => setPasswordConfirm(e.target.value)}
             dir="ltr"
           />
         </div>

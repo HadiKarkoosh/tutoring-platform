@@ -51,13 +51,19 @@ export default function LoginPage() {
           />
         </div>
         <div className="field">
-          <label>كلمة المرور</label>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+            <label style={{ marginBottom: 0 }}>كلمة المرور</label>
+            <Link href="/forgot-password" style={{ color: 'var(--primary-light)', fontSize: 13 }}>
+              نسيت كلمة المرور؟
+            </Link>
+          </div>
           <input
             type="password"
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             dir="ltr"
+            style={{ marginTop: 6 }}
           />
         </div>
         <button className="btn" style={{ width: '100%' }} disabled={busy}>

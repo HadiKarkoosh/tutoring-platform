@@ -32,6 +32,12 @@ export class User {
   @Column({ type: 'int', nullable: true })
   hourlyRate: number | null;
 
+  @Column({ type: 'text', nullable: true, select: false })
+  resetTokenHash: string | null;
+
+  @Column({ type: 'datetime', nullable: true, select: false })
+  resetTokenExpiresAt: Date | null;
+
   @ManyToMany(() => Subject, { eager: true })
   @JoinTable()
   subjects: Subject[];

@@ -4,12 +4,20 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { IsDateString } from 'class-validator';
+import {
+  IsArray,
+  IsDateString,
+  IsInt,
+  IsOptional,
+  IsString,
+  Min,
+} from 'class-validator';
 import { JwtAuthGuard, Roles, RolesGuard } from '../auth/guards';
 import { TutorsService } from './tutors.service';
 
@@ -21,11 +29,34 @@ class CreateSlotDto {
   endTime: string;
 }
 
+class UpdateProfileDto {
+  @IsOptional()
+  @IsString()
+  bio?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  hourlyRate?: number;
+
+  @IsOptional()
+  @IsArray()
+  @IsInt({ each: true })
+  subjectIds?: number[];
+}
+
 @Controller('tutors')
 export class TutorsController {
   constructor(private tutors: TutorsService) {}
 
   // --- Tutor self-management (must come before :id routes) ---
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('tutor')
+  @Patch('me')
+  updateProfile(@Req() req: any, @Body() dto: UpdateProfileDto) {
+    return this.tutors.updateProfile(req.user.id, dto);
+  }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('tutor')
@@ -39,6 +70,22 @@ export class TutorsController {
   @Post('me/slots')
   addSlot(@Req() req: any, @Body() dto: CreateSlotDto) {
     return this.tutors.addSlot(req.user.id, dto.startTime, dto.endTime);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('tutor')
+  @Patch('me/slots/:slotId')
+  updateSlot(
+    @Req() req: any,
+    @Param('slotId') slotId: string,
+    @Body() dto: CreateSlotDto,
+  ) {
+    return this.tutors.updateSlot(
+      req.user.id,
+      slotId,
+      dto.startTime,
+      dto.endTime,
+    );
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -58,8 +105,8 @@ export class TutorsController {
   // --- Public ---
 
   @Get()
-  findAll(@Query('subject') subject?: string) {
-    return this.tutors.findAll(subject);
+  findAll(@Query('subject') subject?: string, @Query('search') search?: string) {
+    return this.tutors.findAll(subject, search);
   }
 
   @Get(':id')
