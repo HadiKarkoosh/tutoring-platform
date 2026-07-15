@@ -1,0 +1,59 @@
+'use client';
+
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '../lib/auth-context';
+
+export default function Navbar() {
+  const { user, loading, logout } = useAuth();
+  const router = useRouter();
+
+  return (
+    <nav className="navbar">
+      <div className="navbar-inner">
+        <Link href="/" className="brand">
+          📚 منصة الدروس
+        </Link>
+        <div className="nav-links">
+          <Link href="/" className="nav-link">
+            المدرّسون
+          </Link>
+          {!loading && user && (
+            <>
+              <Link
+                href={
+                  user.role === 'tutor'
+                    ? '/dashboard/tutor'
+                    : '/dashboard/student'
+                }
+                className="nav-link"
+              >
+                لوحة التحكم
+              </Link>
+              <span className="badge badge-muted">{user.name}</span>
+              <button
+                className="btn btn-outline btn-sm"
+                onClick={() => {
+                  logout();
+                  router.push('/');
+                }}
+              >
+                خروج
+              </button>
+            </>
+          )}
+          {!loading && !user && (
+            <>
+              <Link href="/login" className="nav-link">
+                دخول
+              </Link>
+              <Link href="/register" className="btn btn-sm">
+                إنشاء حساب
+              </Link>
+            </>
+          )}
+        </div>
+      </div>
+    </nav>
+  );
+}
