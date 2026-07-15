@@ -85,17 +85,19 @@ export class SeedService implements OnModuleInit {
       await this.addFutureSlots(tutor);
     }
 
-    // Generic "quick demo login" accounts, same convention as the shop project.
-    const programming = await this.subjects.findOne({ where: { name: 'برمجة' } });
+    // Quick-demo-login tutor account, same convention as the shop project's
+    // seller@demo.com / customer@demo.com — but with a real name and subject
+    // instead of a generic placeholder.
+    const biology = await this.subjects.findOne({ where: { name: 'أحياء' } });
     const demoTutor = await this.users.save(
       this.users.create({
-        name: 'Demo Tutor',
+        name: 'Mohamed Al-Kasem',
         email: 'tutor@demo.com',
         passwordHash: await bcrypt.hash('Demo1234', 10),
         role: 'tutor',
-        bio: 'حساب تجريبي جاهز للتجربة السريعة.',
+        bio: 'مدرّس أحياء، بحب يخلّي المادة قريبة من حياة الطالب اليومية بدل الحفظ الجاف.',
         hourlyRate: 20,
-        subjects: programming ? [programming] : [],
+        subjects: biology ? [biology] : [],
       }),
     );
     await this.addFutureSlots(demoTutor);

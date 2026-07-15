@@ -1,21 +1,20 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '../lib/auth-context';
 
 export default function Navbar() {
   const { user, loading, logout } = useAuth();
   const router = useRouter();
-  const pathname = usePathname();
 
-  function goToTutors(e: React.MouseEvent) {
-    // Already on the listing — a Link to the same URL is a no-op, which
-    // reads as "the button does nothing". Scroll back up instead.
-    if (pathname === '/') {
-      e.preventDefault();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+  function goToTutors() {
+    // A Link to "/" is a no-op when already on "/" — no navigation event
+    // fires, so nothing visibly happens. Always force a real transition:
+    // navigate first (harmless if already there), then scroll to the
+    // listing regardless of which page we started from.
+    router.push('/');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   return (
@@ -25,9 +24,14 @@ export default function Navbar() {
           📚 منصة الدروس
         </Link>
         <div className="nav-links">
-          <Link href="/" className="nav-link" onClick={goToTutors}>
+          <button
+            type="button"
+            className="nav-link"
+            onClick={goToTutors}
+            style={{ background: 'none', border: 'none', font: 'inherit', cursor: 'pointer' }}
+          >
             المدرّسون
-          </Link>
+          </button>
           {!loading && user && (
             <>
               <Link
