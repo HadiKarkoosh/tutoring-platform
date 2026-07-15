@@ -40,14 +40,6 @@ const NAMED_TUTORS: SeedTutor[] = [
     bio: 'مدرّس فيزياء متخصص، بيربط المادة بأمثلة من الواقع لتسهيل الفهم.',
     hourlyRate: 18,
   },
-  {
-    name: 'Malaz Mansour',
-    email: 'malaz@gmail.com',
-    password: 'password1',
-    subjectName: 'لغة إنجليزية',
-    bio: 'مدرّبة لغة إنجليزية معتمدة، بتركّز على المحادثة والثقة باستخدام اللغة.',
-    hourlyRate: 20,
-  },
 ];
 
 @Injectable()
@@ -108,6 +100,16 @@ export class SeedService implements OnModuleInit {
         email: 'student@demo.com',
         passwordHash: await bcrypt.hash('Demo1234', 10),
         role: 'student',
+      }),
+    );
+
+    // Admin account — same name used across the shop project, repurposed here.
+    await this.users.save(
+      this.users.create({
+        name: 'Malaz Mansour',
+        email: 'malaz@gmail.com',
+        passwordHash: await bcrypt.hash('password1', 10),
+        role: 'admin',
       }),
     );
 

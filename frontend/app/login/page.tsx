@@ -25,7 +25,11 @@ export default function LoginPage() {
       );
       login(res.accessToken, res.user);
       router.push(
-        res.user.role === 'tutor' ? '/dashboard/tutor' : '/dashboard/student',
+        res.user.role === 'admin'
+          ? '/admin'
+          : res.user.role === 'tutor'
+            ? '/dashboard/tutor'
+            : '/dashboard/student',
       );
     } catch (err: any) {
       setError(err.message ?? 'تعذّر تسجيل الدخول');
@@ -69,6 +73,21 @@ export default function LoginPage() {
           className="btn btn-sm"
           style={{ marginTop: 8 }}
           onClick={() => fillDemo('student@demo.com', 'Demo1234')}
+        >
+          تعبئة تلقائية
+        </button>
+      </div>
+
+      <div className="demo-box">
+        💡 <strong>للتجربة السريعة كإدارة:</strong>
+        <br />
+        البريد: <code dir="ltr">malaz@gmail.com</code> — كلمة المرور: <code dir="ltr">password1</code>
+        <br />
+        <button
+          type="button"
+          className="btn btn-sm"
+          style={{ marginTop: 8 }}
+          onClick={() => fillDemo('malaz@gmail.com', 'password1')}
         >
           تعبئة تلقائية
         </button>

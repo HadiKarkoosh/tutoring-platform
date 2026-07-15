@@ -10,7 +10,7 @@ import { AuthGuard } from '@nestjs/passport';
 export class JwtAuthGuard extends AuthGuard('jwt') {}
 
 export const ROLES_KEY = 'roles';
-export const Roles = (...roles: Array<'tutor' | 'student'>) =>
+export const Roles = (...roles: Array<'tutor' | 'student' | 'admin'>) =>
   SetMetadata(ROLES_KEY, roles);
 
 @Injectable()

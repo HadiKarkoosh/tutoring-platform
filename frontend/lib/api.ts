@@ -45,7 +45,40 @@ export interface SessionUser {
   id: string;
   name: string;
   email: string;
-  role: 'tutor' | 'student';
+  role: 'tutor' | 'student' | 'admin';
+}
+
+export interface AdminStats {
+  totalTutors: number;
+  totalStudents: number;
+  totalAdmins: number;
+  totalBookings: number;
+  totalSubjects: number;
+  totalReviews: number;
+}
+
+export interface AdminUser {
+  id: string;
+  name: string;
+  email: string;
+  role: 'tutor' | 'student' | 'admin';
+  hourlyRate: number | null;
+  subjects: Subject[];
+}
+
+export interface AdminPricing {
+  tutors: { id: string; name: string; hourlyRate: number | null; subjects: string[] }[];
+  averageBySubject: { subject: string; average: number; count: number }[];
+}
+
+export interface AdminBooking {
+  id: string;
+  status: string;
+  createdAt: string;
+  startTime: string;
+  endTime: string;
+  tutor: { id: string; name: string };
+  student: { id: string; name: string };
 }
 
 export class ApiError extends Error {

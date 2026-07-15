@@ -36,13 +36,15 @@ export default function Navbar() {
             <>
               <Link
                 href={
-                  user.role === 'tutor'
-                    ? '/dashboard/tutor'
-                    : '/dashboard/student'
+                  user.role === 'admin'
+                    ? '/admin'
+                    : user.role === 'tutor'
+                      ? '/dashboard/tutor'
+                      : '/dashboard/student'
                 }
                 className="nav-link"
               >
-                لوحة التحكم
+                {user.role === 'admin' ? 'لوحة الإدارة' : 'لوحة التحكم'}
               </Link>
               <span className="badge badge-muted">{user.name}</span>
               <button
