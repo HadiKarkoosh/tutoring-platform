@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AppController } from './app.controller';
 import { User } from './entities/user.entity';
 import { Subject } from './entities/subject.entity';
 import { AvailabilitySlot } from './entities/availability-slot.entity';
@@ -25,5 +26,6 @@ import { ReviewsModule } from './reviews/reviews.module';
     SubjectsModule,
     ReviewsModule,
   ],
+  controllers: [AppController],
 })
 export class AppModule {}
