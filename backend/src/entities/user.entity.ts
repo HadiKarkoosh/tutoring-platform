@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import { Subject } from './subject.entity';
 
-export type UserRole = 'tutor' | 'student' | 'admin';
+export type UserRole = 'tutor' | 'student';
 
 @Entity()
 export class User {

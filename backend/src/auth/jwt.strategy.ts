@@ -17,7 +17,7 @@ export const JWT_SECRET = resolveJwtSecret();
 export interface JwtPayload {
   sub: string;
   email: string;
-  role: 'tutor' | 'student' | 'admin';
+  role: 'tutor' | 'student';
   name: string;
 }
 
