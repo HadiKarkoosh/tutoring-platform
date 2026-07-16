@@ -1,5 +1,14 @@
 # منصة الدروس الخصوصية
 
+![Next.js](https://img.shields.io/badge/Next.js-14-000000?logo=next.js&logoColor=white)
+![Nest.js](https://img.shields.io/badge/Nest.js-10-E0234E?logo=nestjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+![Deployed on Vercel](https://img.shields.io/badge/Frontend-Vercel-000000?logo=vercel&logoColor=white)
+![Deployed on Railway](https://img.shields.io/badge/Backend-Railway-0B0D0E?logo=railway&logoColor=white)
+
+🔗 **Live demo:** https://tutoring-platform-chi.vercel.app
+🔗 **API:** https://tutoring-platform-production-15ef.up.railway.app
+
 منصة حجز دروس: طلاب يتصفحون المدرّسين حسب المادة أو الاسم ويحجزون مواعيد متاحة ويقيّمون تجربتهم، ومدرّسون يديرون ملفهم الشخصي ومواعيدهم وحجوزاتهم.
 
 ## التقنيات
@@ -29,7 +38,7 @@ npm run start:dev
 | مدرّس | tutor@demo.com | Demo1234 |
 | طالب | student@demo.com | Demo1234 |
 
-أزرار "تعبئة تلقائية" لهالحسابين موجودة مباشرة بصفحة تسجيل الدخول. فيه كمان 4 مدرّسين تجريبيين بأسماء وموادّ حقيقية (Hadi Karkoosh — برمجة، Ali Kheder — رياضيات، Karam Al-Hajjah — فيزياء، Malaz Mansour — لغة إنجليزية) لتصفح صفحة رئيسية غنية بالمحتوى من أول تشغيل.
+أزرار "تعبئة تلقائية" لهالحسابين موجودة مباشرة بصفحة تسجيل الدخول. فيه كمان 4 مدرّسين تجريبيين بأسماء وموادّ حقيقية (Hadi Karkoosh — برمجة، Ali Kheder — رياضيات، Karam Al-Hajjah — فيزياء، Malaz Mansour — إدارة أعمال) لتصفح صفحة رئيسية غنية بالمحتوى من أول تشغيل.
 
 ### 2. الفرونت اند (المنفذ 3000)
 
@@ -91,3 +100,8 @@ npm test
 ## اختبار سريع للسباق (يدوي)
 
 شغّل الباك اند ثم نفّذ طلبين متزامنين على نفس الموعد بحسابي طالبين — النتيجة: واحد 201 والثاني 409، وحجز واحد فقط بقاعدة البيانات. نفس السيناريو مغطى آلياً بـ `npm test`.
+
+## النشر
+
+- **الباك اند (Railway)**: قاعدة SQLite بحاجة تخزين دائم، فمركّب عليها **Volume** بمسار `/data` (`DB_PATH=/data/tutoring.sqlite`) حتى البيانات ما تنمسح كل ديبلوي — نظام الملفات العادي على Railway مؤقت.
+- **الفرونت اند (Vercel)**: `NEXT_PUBLIC_API_URL` بيشاور على رابط الباك اند فوق، ولازم يكون Project-level env var (مو بس فلاغ وقت الديبلوي) عشان يترز صح جوّا الـ build.
