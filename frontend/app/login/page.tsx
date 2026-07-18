@@ -5,6 +5,25 @@ import { useRouter } from 'next/navigation';
 import { FormEvent, useState } from 'react';
 import { api, SessionUser } from '../../lib/api';
 import { useAuth } from '../../lib/auth-context';
+import { useT } from '../../lib/i18n';
+
+const TEXT = {
+  title: { ar: 'تسجيل الدخول', en: 'Log in' },
+  subtitle: { ar: 'أهلاً بعودتك!', en: 'Welcome back!' },
+  demoTutorTitle: { ar: 'للتجربة السريعة كمدرّس:', en: 'Quick tutor demo:' },
+  demoStudentTitle: { ar: 'للتجربة السريعة كطالب:', en: 'Quick student demo:' },
+  emailLabel: { ar: 'البريد:', en: 'Email:' },
+  passwordLabel: { ar: 'كلمة المرور:', en: 'Password:' },
+  autofill: { ar: 'تعبئة تلقائية', en: 'Auto-fill' },
+  email: { ar: 'البريد الإلكتروني', en: 'Email' },
+  password: { ar: 'كلمة المرور', en: 'Password' },
+  forgotPassword: { ar: 'نسيت كلمة المرور؟', en: 'Forgot password?' },
+  loggingIn: { ar: 'جارٍ الدخول…', en: 'Logging in…' },
+  submit: { ar: 'دخول', en: 'Log in' },
+  noAccount: { ar: 'ما عندك حساب؟', en: "Don't have an account?" },
+  registerNow: { ar: 'سجّل الآن', en: 'Sign up' },
+  loginFailed: { ar: 'تعذّر تسجيل الدخول', en: 'Could not log in' },
+};
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -13,6 +32,7 @@ export default function LoginPage() {
   const [busy, setBusy] = useState(false);
   const { login } = useAuth();
   const router = useRouter();
+  const t = useT(TEXT);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -28,7 +48,7 @@ export default function LoginPage() {
         res.user.role === 'tutor' ? '/dashboard/tutor' : '/dashboard/student',
       );
     } catch (err: any) {
-      setError(err.message ?? 'تعذّر تسجيل الدخول');
+      setError(err.message ?? t.loginFailed);
     } finally {
       setBusy(false);
     }
@@ -41,13 +61,13 @@ export default function LoginPage() {
 
   return (
     <div className="card form-card">
-      <h1 className="page-title">تسجيل الدخول</h1>
-      <p className="page-subtitle">أهلاً بعودتك!</p>
+      <h1 className="page-title">{t.title}</h1>
+      <p className="page-subtitle">{t.subtitle}</p>
 
       <div className="demo-box">
-        💡 <strong>للتجربة السريعة كمدرّس:</strong>
+        💡 <strong>{t.demoTutorTitle}</strong>
         <br />
-        البريد: <code dir="ltr">tutor@demo.com</code> — كلمة المرور: <code dir="ltr">Demo1234</code>
+        {t.emailLabel} <code dir="ltr">tutor@demo.com</code> — {t.passwordLabel} <code dir="ltr">Demo1234</code>
         <br />
         <button
           type="button"
@@ -55,14 +75,14 @@ export default function LoginPage() {
           style={{ marginTop: 8 }}
           onClick={() => fillDemo('tutor@demo.com', 'Demo1234')}
         >
-          تعبئة تلقائية
+          {t.autofill}
         </button>
       </div>
 
       <div className="demo-box">
-        💡 <strong>للتجربة السريعة كطالب:</strong>
+        💡 <strong>{t.demoStudentTitle}</strong>
         <br />
-        البريد: <code dir="ltr">student@demo.com</code> — كلمة المرور: <code dir="ltr">Demo1234</code>
+        {t.emailLabel} <code dir="ltr">student@demo.com</code> — {t.passwordLabel} <code dir="ltr">Demo1234</code>
         <br />
         <button
           type="button"
@@ -70,14 +90,14 @@ export default function LoginPage() {
           style={{ marginTop: 8 }}
           onClick={() => fillDemo('student@demo.com', 'Demo1234')}
         >
-          تعبئة تلقائية
+          {t.autofill}
         </button>
       </div>
 
       {error && <div className="alert alert-error">{error}</div>}
       <form onSubmit={onSubmit}>
         <div className="field">
-          <label>البريد الإلكتروني</label>
+          <label>{t.email}</label>
           <input
             type="email"
             required
@@ -88,9 +108,9 @@ export default function LoginPage() {
         </div>
         <div className="field">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-            <label style={{ marginBottom: 0 }}>كلمة المرور</label>
+            <label style={{ marginBottom: 0 }}>{t.password}</label>
             <Link href="/forgot-password" style={{ color: 'var(--primary-light)', fontSize: 13 }}>
-              نسيت كلمة المرور؟
+              {t.forgotPassword}
             </Link>
           </div>
           <input
@@ -103,11 +123,11 @@ export default function LoginPage() {
           />
         </div>
         <button className="btn" style={{ width: '100%' }} disabled={busy}>
-          {busy ? 'جارٍ الدخول…' : 'دخول'}
+          {busy ? t.loggingIn : t.submit}
         </button>
       </form>
       <p className="muted" style={{ marginTop: 16, textAlign: 'center' }}>
-        ما عندك حساب؟ <Link href="/register" style={{ color: 'var(--primary)' }}>سجّل الآن</Link>
+        {t.noAccount} <Link href="/register" style={{ color: 'var(--primary)' }}>{t.registerNow}</Link>
       </p>
     </div>
   );

@@ -82,15 +82,15 @@ export async function api<T>(
   return res.json();
 }
 
-export function formatSlot(slot: Slot) {
-  const fmt = new Intl.DateTimeFormat('ar', {
+export function formatSlot(slot: Slot, locale: 'ar' | 'en' = 'ar') {
+  const fmt = new Intl.DateTimeFormat(locale, {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
     hour: '2-digit',
     minute: '2-digit',
   });
-  const time = new Intl.DateTimeFormat('ar', {
+  const time = new Intl.DateTimeFormat(locale, {
     hour: '2-digit',
     minute: '2-digit',
   });

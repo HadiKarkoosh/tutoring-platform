@@ -5,6 +5,29 @@ import { useRouter } from 'next/navigation';
 import { FormEvent, useEffect, useState } from 'react';
 import { api, SessionUser, Subject } from '../../lib/api';
 import { useAuth } from '../../lib/auth-context';
+import { useT } from '../../lib/i18n';
+
+const TEXT = {
+  title: { ar: 'إنشاء حساب', en: 'Create an account' },
+  subtitle: { ar: 'انضم كطالب أو كمدرّس', en: 'Join as a student or a tutor' },
+  name: { ar: 'الاسم', en: 'Name' },
+  email: { ar: 'البريد الإلكتروني', en: 'Email' },
+  password: { ar: 'كلمة المرور (6 أحرف على الأقل)', en: 'Password (6+ characters)' },
+  passwordConfirm: { ar: 'تأكيد كلمة المرور', en: 'Confirm password' },
+  accountType: { ar: 'نوع الحساب', en: 'Account type' },
+  student: { ar: 'طالب', en: 'Student' },
+  tutor: { ar: 'مدرّس', en: 'Tutor' },
+  bio: { ar: 'نبذة عنك', en: 'About you' },
+  bioPlaceholder: { ar: 'خبرتك، أسلوبك بالتدريس…', en: 'Your experience, teaching style…' },
+  hourlyRate: { ar: 'سعر الساعة', en: 'Hourly rate' },
+  subjectsLabel: { ar: 'المواد التي تدرّسها', en: 'Subjects you teach' },
+  creating: { ar: 'جارٍ الإنشاء…', en: 'Creating…' },
+  submit: { ar: 'إنشاء الحساب', en: 'Create account' },
+  haveAccount: { ar: 'عندك حساب؟', en: 'Already have an account?' },
+  loginNow: { ar: 'سجّل دخولك', en: 'Log in' },
+  passwordMismatch: { ar: 'كلمتا المرور غير متطابقتين', en: 'Passwords do not match' },
+  registerFailed: { ar: 'تعذّر إنشاء الحساب', en: 'Could not create the account' },
+};
 
 export default function RegisterPage() {
   const [name, setName] = useState('');
@@ -20,6 +43,7 @@ export default function RegisterPage() {
   const [busy, setBusy] = useState(false);
   const { login } = useAuth();
   const router = useRouter();
+  const t = useT(TEXT);
 
   useEffect(() => {
     api<Subject[]>('/subjects').then(setSubjects).catch(() => {});
@@ -35,7 +59,7 @@ export default function RegisterPage() {
     e.preventDefault();
     setError('');
     if (password !== passwordConfirm) {
-      setError('كلمتا المرور غير متطابقتين');
+      setError(t.passwordMismatch);
       return;
     }
     setBusy(true);
@@ -53,7 +77,7 @@ export default function RegisterPage() {
       login(res.accessToken, res.user);
       router.push(role === 'tutor' ? '/dashboard/tutor' : '/');
     } catch (err: any) {
-      setError(err.message ?? 'تعذّر إنشاء الحساب');
+      setError(err.message ?? t.registerFailed);
     } finally {
       setBusy(false);
     }
@@ -61,16 +85,16 @@ export default function RegisterPage() {
 
   return (
     <div className="card form-card">
-      <h1 className="page-title">إنشاء حساب</h1>
-      <p className="page-subtitle">انضم كطالب أو كمدرّس</p>
+      <h1 className="page-title">{t.title}</h1>
+      <p className="page-subtitle">{t.subtitle}</p>
       {error && <div className="alert alert-error">{error}</div>}
       <form onSubmit={onSubmit}>
         <div className="field">
-          <label>الاسم</label>
+          <label>{t.name}</label>
           <input required value={name} onChange={(e) => setName(e.target.value)} />
         </div>
         <div className="field">
-          <label>البريد الإلكتروني</label>
+          <label>{t.email}</label>
           <input
             type="email"
             required
@@ -80,7 +104,7 @@ export default function RegisterPage() {
           />
         </div>
         <div className="field">
-          <label>كلمة المرور (6 أحرف على الأقل)</label>
+          <label>{t.password}</label>
           <input
             type="password"
             required
@@ -91,7 +115,7 @@ export default function RegisterPage() {
           />
         </div>
         <div className="field">
-          <label>تأكيد كلمة المرور</label>
+          <label>{t.passwordConfirm}</label>
           <input
             type="password"
             required
@@ -102,29 +126,29 @@ export default function RegisterPage() {
           />
         </div>
         <div className="field">
-          <label>نوع الحساب</label>
+          <label>{t.accountType}</label>
           <select
             value={role}
             onChange={(e) => setRole(e.target.value as 'student' | 'tutor')}
           >
-            <option value="student">طالب</option>
-            <option value="tutor">مدرّس</option>
+            <option value="student">{t.student}</option>
+            <option value="tutor">{t.tutor}</option>
           </select>
         </div>
 
         {role === 'tutor' && (
           <>
             <div className="field">
-              <label>نبذة عنك</label>
+              <label>{t.bio}</label>
               <textarea
                 rows={3}
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
-                placeholder="خبرتك، أسلوبك بالتدريس…"
+                placeholder={t.bioPlaceholder}
               />
             </div>
             <div className="field">
-              <label>سعر الساعة</label>
+              <label>{t.hourlyRate}</label>
               <input
                 type="number"
                 min={0}
@@ -134,7 +158,7 @@ export default function RegisterPage() {
               />
             </div>
             <div className="field">
-              <label>المواد التي تدرّسها</label>
+              <label>{t.subjectsLabel}</label>
               <div className="filters" style={{ marginBottom: 0 }}>
                 {subjects.map((s) => (
                   <button
@@ -152,11 +176,11 @@ export default function RegisterPage() {
         )}
 
         <button className="btn" style={{ width: '100%' }} disabled={busy}>
-          {busy ? 'جارٍ الإنشاء…' : 'إنشاء الحساب'}
+          {busy ? t.creating : t.submit}
         </button>
       </form>
       <p className="muted" style={{ marginTop: 16, textAlign: 'center' }}>
-        عندك حساب؟ <Link href="/login" style={{ color: 'var(--primary)' }}>سجّل دخولك</Link>
+        {t.haveAccount} <Link href="/login" style={{ color: 'var(--primary)' }}>{t.loginNow}</Link>
       </p>
     </div>
   );

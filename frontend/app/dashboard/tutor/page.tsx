@@ -4,6 +4,41 @@ import { useRouter } from 'next/navigation';
 import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { api, Booking, formatSlot, Slot, Subject, Tutor } from '../../../lib/api';
 import { useAuth } from '../../../lib/auth-context';
+import { useLang, useT } from '../../../lib/i18n';
+
+const TEXT = {
+  loading: { ar: 'جارٍ التحميل…', en: 'Loading…' },
+  tutorDashboard: { ar: 'لوحة المدرّس', en: 'Tutor dashboard' },
+  welcome: { ar: 'مرحباً', en: 'Welcome' },
+  myProfile: { ar: 'ملفي الشخصي', en: 'My profile' },
+  bio: { ar: 'نبذة عنك', en: 'About you' },
+  hourlyRate: { ar: 'سعر الساعة', en: 'Hourly rate' },
+  subjectsLabel: { ar: 'المواد التي تدرّسها', en: 'Subjects you teach' },
+  saving: { ar: 'جارٍ الحفظ…', en: 'Saving…' },
+  saveChanges: { ar: 'حفظ التعديلات', en: 'Save changes' },
+  addSlotTitle: { ar: 'إضافة موعد متاح', en: 'Add an available slot' },
+  from: { ar: 'من', en: 'From' },
+  to: { ar: 'إلى', en: 'To' },
+  adding: { ar: 'جارٍ الإضافة…', en: 'Adding…' },
+  addSlot: { ar: 'أضف الموعد', en: 'Add slot' },
+  mySlots: { ar: 'مواعيدي', en: 'My slots' },
+  noSlots: { ar: 'لا توجد مواعيد بعد.', en: 'No slots yet.' },
+  booked: { ar: 'محجوز', en: 'Booked' },
+  available: { ar: 'متاح', en: 'Available' },
+  edit: { ar: 'تعديل', en: 'Edit' },
+  delete: { ar: 'حذف', en: 'Delete' },
+  cancel: { ar: 'إلغاء', en: 'Cancel' },
+  save: { ar: 'حفظ', en: 'Save' },
+  incomingBookings: { ar: 'الحجوزات الواردة', en: 'Incoming bookings' },
+  noBookings: { ar: 'لا توجد حجوزات بعد.', en: 'No bookings yet.' },
+  confirmed: { ar: 'مؤكد', en: 'Confirmed' },
+  slotAdded: { ar: 'تمت إضافة الموعد', en: 'Slot added' },
+  addFailed: { ar: 'تعذّرت الإضافة', en: 'Could not add the slot' },
+  deleteFailed: { ar: 'تعذّر الحذف', en: 'Could not delete' },
+  editFailed: { ar: 'تعذّر تعديل الموعد', en: 'Could not edit the slot' },
+  profileSaved: { ar: 'تم حفظ التعديلات', en: 'Changes saved' },
+  saveFailed: { ar: 'تعذّر الحفظ', en: 'Could not save' },
+};
 
 export default function TutorDashboard() {
   const { user, token, loading: authLoading } = useAuth();
@@ -28,6 +63,8 @@ export default function TutorDashboard() {
   const [profileBusy, setProfileBusy] = useState(false);
   const [profileMessage, setProfileMessage] = useState('');
   const [profileError, setProfileError] = useState('');
+  const { lang } = useLang();
+  const t = useT(TEXT);
 
   const load = useCallback(() => {
     if (!token || !user) return;
@@ -35,10 +72,10 @@ export default function TutorDashboard() {
     api<Booking[]>('/tutors/me/bookings', {}, token)
       .then(setBookings)
       .catch(() => {});
-    api<Tutor>(`/tutors/${user.id}`).then((t) => {
-      setBio(t.bio ?? '');
-      setHourlyRate(t.hourlyRate != null ? String(t.hourlyRate) : '');
-      setSelectedSubjects(t.subjects.map((s) => s.id));
+    api<Tutor>(`/tutors/${user.id}`).then((tut) => {
+      setBio(tut.bio ?? '');
+      setHourlyRate(tut.hourlyRate != null ? String(tut.hourlyRate) : '');
+      setSelectedSubjects(tut.subjects.map((s) => s.id));
     });
   }, [token, user]);
 
@@ -71,12 +108,12 @@ export default function TutorDashboard() {
         },
         token,
       );
-      setSuccess('تمت إضافة الموعد');
+      setSuccess(t.slotAdded);
       setStartTime('');
       setEndTime('');
       load();
     } catch (err: any) {
-      setError(err.message ?? 'تعذّرت الإضافة');
+      setError(err.message ?? t.addFailed);
     } finally {
       setBusy(false);
     }
@@ -89,7 +126,7 @@ export default function TutorDashboard() {
       await api(`/tutors/me/slots/${id}`, { method: 'DELETE' }, token);
       load();
     } catch (err: any) {
-      setError(err.message ?? 'تعذّر الحذف');
+      setError(err.message ?? t.deleteFailed);
     }
   }
 
@@ -118,7 +155,7 @@ export default function TutorDashboard() {
       setEditingSlotId(null);
       load();
     } catch (err: any) {
-      setError(err.message ?? 'تعذّر تعديل الموعد');
+      setError(err.message ?? t.editFailed);
     } finally {
       setEditBusy(false);
     }
@@ -148,34 +185,34 @@ export default function TutorDashboard() {
         },
         token,
       );
-      setProfileMessage('تم حفظ التعديلات');
+      setProfileMessage(t.profileSaved);
     } catch (err: any) {
-      setProfileError(err.message ?? 'تعذّر الحفظ');
+      setProfileError(err.message ?? t.saveFailed);
     } finally {
       setProfileBusy(false);
     }
   }
 
-  if (authLoading || !user) return <p className="muted">جارٍ التحميل…</p>;
+  if (authLoading || !user) return <p className="muted">{t.loading}</p>;
 
   return (
     <>
-      <h1 className="page-title">لوحة المدرّس</h1>
-      <p className="page-subtitle">مرحباً {user.name} 👋</p>
+      <h1 className="page-title">{t.tutorDashboard}</h1>
+      <p className="page-subtitle">{t.welcome} {user.name} 👋</p>
       {error && <div className="alert alert-error">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
 
       <div className="card" style={{ marginBottom: 24 }}>
-        <h2 style={{ marginBottom: 12 }}>ملفي الشخصي</h2>
+        <h2 style={{ marginBottom: 12 }}>{t.myProfile}</h2>
         {profileError && <div className="alert alert-error">{profileError}</div>}
         {profileMessage && <div className="alert alert-success">{profileMessage}</div>}
         <form onSubmit={saveProfile}>
           <div className="field">
-            <label>نبذة عنك</label>
+            <label>{t.bio}</label>
             <textarea rows={3} value={bio} onChange={(e) => setBio(e.target.value)} />
           </div>
           <div className="field" style={{ maxWidth: 200 }}>
-            <label>سعر الساعة</label>
+            <label>{t.hourlyRate}</label>
             <input
               type="number"
               min={0}
@@ -185,7 +222,7 @@ export default function TutorDashboard() {
             />
           </div>
           <div className="field">
-            <label>المواد التي تدرّسها</label>
+            <label>{t.subjectsLabel}</label>
             <div className="filters" style={{ marginBottom: 0 }}>
               {subjects.map((s) => (
                 <button
@@ -200,19 +237,19 @@ export default function TutorDashboard() {
             </div>
           </div>
           <button className="btn btn-sm" disabled={profileBusy}>
-            {profileBusy ? 'جارٍ الحفظ…' : 'حفظ التعديلات'}
+            {profileBusy ? t.saving : t.saveChanges}
           </button>
         </form>
       </div>
 
       <div className="card" style={{ marginBottom: 24 }}>
-        <h2 style={{ marginBottom: 12 }}>إضافة موعد متاح</h2>
+        <h2 style={{ marginBottom: 12 }}>{t.addSlotTitle}</h2>
         <form
           onSubmit={addSlot}
           style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'flex-end' }}
         >
           <div className="field" style={{ marginBottom: 0, flex: 1, minWidth: 200 }}>
-            <label>من</label>
+            <label>{t.from}</label>
             <input
               type="datetime-local"
               required
@@ -222,7 +259,7 @@ export default function TutorDashboard() {
             />
           </div>
           <div className="field" style={{ marginBottom: 0, flex: 1, minWidth: 200 }}>
-            <label>إلى</label>
+            <label>{t.to}</label>
             <input
               type="datetime-local"
               required
@@ -232,20 +269,20 @@ export default function TutorDashboard() {
             />
           </div>
           <button className="btn" disabled={busy}>
-            {busy ? 'جارٍ الإضافة…' : 'أضف الموعد'}
+            {busy ? t.adding : t.addSlot}
           </button>
         </form>
       </div>
 
       <div className="card" style={{ marginBottom: 24 }}>
-        <h2 style={{ marginBottom: 12 }}>مواعيدي</h2>
-        {slots.length === 0 && <p className="muted">لا توجد مواعيد بعد.</p>}
+        <h2 style={{ marginBottom: 12 }}>{t.mySlots}</h2>
+        {slots.length === 0 && <p className="muted">{t.noSlots}</p>}
         {slots.map((s) =>
           editingSlotId === s.id ? (
             <div key={s.id} className="slot-row" style={{ gap: 12 }}>
               <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', flex: 1 }}>
                 <div className="field" style={{ marginBottom: 0, flex: 1, minWidth: 180 }}>
-                  <label>من</label>
+                  <label>{t.from}</label>
                   <input
                     type="datetime-local"
                     value={editStart}
@@ -254,7 +291,7 @@ export default function TutorDashboard() {
                   />
                 </div>
                 <div className="field" style={{ marginBottom: 0, flex: 1, minWidth: 180 }}>
-                  <label>إلى</label>
+                  <label>{t.to}</label>
                   <input
                     type="datetime-local"
                     value={editEnd}
@@ -265,34 +302,34 @@ export default function TutorDashboard() {
               </div>
               <div style={{ display: 'flex', gap: 8 }}>
                 <button className="btn btn-sm" disabled={editBusy} onClick={() => saveEdit(s.id)}>
-                  {editBusy ? 'جارٍ الحفظ…' : 'حفظ'}
+                  {editBusy ? t.saving : t.save}
                 </button>
                 <button
                   type="button"
                   className="btn btn-outline btn-sm"
                   onClick={() => setEditingSlotId(null)}
                 >
-                  إلغاء
+                  {t.cancel}
                 </button>
               </div>
             </div>
           ) : (
             <div key={s.id} className="slot-row">
               <span>
-                🗓️ {formatSlot(s)}{' '}
+                🗓️ {formatSlot(s, lang)}{' '}
                 {s.isBooked ? (
-                  <span className="badge">محجوز</span>
+                  <span className="badge">{t.booked}</span>
                 ) : (
-                  <span className="badge badge-muted">متاح</span>
+                  <span className="badge badge-muted">{t.available}</span>
                 )}
               </span>
               {!s.isBooked && (
                 <div style={{ display: 'flex', gap: 8 }}>
                   <button className="btn btn-outline btn-sm" onClick={() => startEdit(s)}>
-                    تعديل
+                    {t.edit}
                   </button>
                   <button className="btn btn-danger btn-sm" onClick={() => removeSlot(s.id)}>
-                    حذف
+                    {t.delete}
                   </button>
                 </div>
               )}
@@ -302,19 +339,19 @@ export default function TutorDashboard() {
       </div>
 
       <div className="card">
-        <h2 style={{ marginBottom: 12 }}>الحجوزات الواردة</h2>
-        {bookings.length === 0 && <p className="muted">لا توجد حجوزات بعد.</p>}
+        <h2 style={{ marginBottom: 12 }}>{t.incomingBookings}</h2>
+        {bookings.length === 0 && <p className="muted">{t.noBookings}</p>}
         {bookings.map((b) => (
           <div key={b.id} className="slot-row">
             <div>
-              <div>🗓️ {formatSlot(b.slot)}</div>
+              <div>🗓️ {formatSlot(b.slot, lang)}</div>
               {b.student && (
                 <div className="muted">
                   👤 {b.student.name} — <span dir="ltr">{b.student.email}</span>
                 </div>
               )}
             </div>
-            <span className="badge">مؤكد</span>
+            <span className="badge">{t.confirmed}</span>
           </div>
         ))}
       </div>
