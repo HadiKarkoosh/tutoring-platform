@@ -32,9 +32,14 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar-inner">
-        <Link href="/" className="brand">
-          {t.brand}
-        </Link>
+        <div className="brand-group">
+          <Link href="/" className="brand">
+            {t.brand}
+          </Link>
+          <button type="button" className="lang-toggle-btn" onClick={toggle}>
+            🌐 <span>EN / عربي</span>
+          </button>
+        </div>
         <div className="nav-links">
           <button
             type="button"
@@ -78,9 +83,6 @@ export default function Navbar() {
               </Link>
             </>
           )}
-          <button type="button" className="btn btn-outline btn-sm lang-toggle" onClick={toggle}>
-            🌐 <span>EN / عربي</span>
-          </button>
         </div>
       </div>
     </nav>
