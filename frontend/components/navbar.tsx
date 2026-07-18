@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../lib/auth-context';
@@ -12,6 +13,7 @@ const TEXT = {
   logout: { ar: 'خروج', en: 'Log out' },
   login: { ar: 'دخول', en: 'Log in' },
   register: { ar: 'إنشاء حساب', en: 'Sign up' },
+  openMenu: { ar: 'فتح القائمة', en: 'Open menu' },
 };
 
 export default function Navbar() {
@@ -19,12 +21,14 @@ export default function Navbar() {
   const router = useRouter();
   const { toggle } = useLang();
   const t = useT(TEXT);
+  const [open, setOpen] = useState(false);
 
   function goToTutors() {
     // A Link to "/" is a no-op when already on "/" — no navigation event
     // fires, so nothing visibly happens. Always force a real transition:
     // navigate first (harmless if already there), then scroll to the
     // listing regardless of which page we started from.
+    setOpen(false);
     router.push('/');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -40,7 +44,20 @@ export default function Navbar() {
             🌐 <span>EN / عربي</span>
           </button>
         </div>
-        <div className="nav-links">
+
+        <button
+          type="button"
+          className="nav-toggle"
+          aria-label={t.openMenu}
+          aria-expanded={open}
+          onClick={() => setOpen((v) => !v)}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+
+        <div className={`nav-links ${open ? 'is-open' : ''}`}>
           <button
             type="button"
             className="nav-link"
@@ -58,6 +75,7 @@ export default function Navbar() {
                     : '/dashboard/student'
                 }
                 className="nav-link"
+                onClick={() => setOpen(false)}
               >
                 {t.dashboard}
               </Link>
@@ -65,6 +83,7 @@ export default function Navbar() {
               <button
                 className="btn btn-outline btn-sm"
                 onClick={() => {
+                  setOpen(false);
                   logout();
                   router.push('/');
                 }}
@@ -75,10 +94,10 @@ export default function Navbar() {
           )}
           {!loading && !user && (
             <>
-              <Link href="/login" className="nav-link">
+              <Link href="/login" className="nav-link" onClick={() => setOpen(false)}>
                 {t.login}
               </Link>
-              <Link href="/register" className="btn btn-sm">
+              <Link href="/register" className="btn btn-sm" onClick={() => setOpen(false)}>
                 {t.register}
               </Link>
             </>
