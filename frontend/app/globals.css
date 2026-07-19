@@ -500,17 +500,24 @@ a {
     max-height: 320px;
   }
 
-  .nav-links .nav-link,
-  .nav-links .btn,
-  .nav-links .badge {
-    width: 100%;
+  .nav-links .nav-link {
+    display: block;
     text-align: center;
-    margin: 4px 12px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
   }
 
-  .nav-links .btn,
-  .nav-links .nav-link {
-    box-sizing: border-box;
+  .nav-links .badge {
+    display: block;
+    width: fit-content;
+    margin: 8px auto;
+  }
+
+  .nav-links .btn {
+    display: block;
+    text-align: center;
+    margin: 10px 24px;
+    border-radius: 100px;
   }
 
   .hero {
