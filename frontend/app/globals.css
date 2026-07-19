@@ -497,26 +497,27 @@ a {
   }
 
   .nav-links.is-open {
-    max-height: 320px;
+    max-height: 600px;
   }
 
   .nav-links .nav-link {
     display: block;
-    text-align: center;
-    padding: 14px 20px;
+    padding: 16px 24px;
     border-bottom: 1px solid var(--border);
+    text-align: center;
+    border-radius: 0;
   }
 
   .nav-links .badge {
     display: block;
     width: fit-content;
-    margin: 8px auto;
+    margin: 12px auto 0;
   }
 
   .nav-links .btn {
     display: block;
     text-align: center;
-    margin: 10px 24px;
+    margin: 16px 24px 22px;
     border-radius: 100px;
   }
 
