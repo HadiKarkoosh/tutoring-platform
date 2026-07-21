@@ -4,9 +4,27 @@ import { LanguageProvider } from '../lib/i18n';
 import Navbar from '../components/navbar';
 import './globals.css';
 
+const TITLE = 'منصة الدروس الخصوصية | Tutoring Platform';
+const DESCRIPTION = 'احجز درسك مع أفضل المدرّسين — Book your lesson with the best tutors';
+
 export const metadata: Metadata = {
-  title: 'منصة الدروس الخصوصية | Tutoring Platform',
-  description: 'احجز درسك مع أفضل المدرّسين — Book your lesson with the best tutors',
+  metadataBase: new URL('https://tutoring-platform-chi.vercel.app'),
+  title: TITLE,
+  description: DESCRIPTION,
+  openGraph: {
+    type: 'website',
+    locale: 'ar_AR',
+    siteName: 'منصة الدروس',
+    title: TITLE,
+    description: DESCRIPTION,
+    images: [{ url: '/og.png', width: 1200, height: 630, alt: TITLE }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: TITLE,
+    description: DESCRIPTION,
+    images: ['/og.png'],
+  },
 };
 
 // Runs before hydration so a saved English preference doesn't flash RTL first.
